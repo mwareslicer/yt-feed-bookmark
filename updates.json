@@ -1,0 +1,12 @@
+{
+	"addons": {
+		"yt-feed-bookmark": {
+			"updates": [
+				{
+					"version": "0.5.0",
+					"update_link": "https://raw.githubusercontent.com/mwareslicer/yt-feed-bookmark/master/releases/yt-feed-bookmark-0.5.0.xpi"
+				}
+			]
+		}
+	}
+}
