@@ -39,7 +39,7 @@
 	],
 	"browser_specific_settings": {
 		"gecko": {
-			"id": "yt-feed-bookmark",
+			"id": "yt-feed-bookmark@mrwhitehat",
 			"strict_min_version": "109.0",
 			"update_url": "https://github.com/mwareslicer/yt-feed-bookmark/raw/master/updates.json"
 		}
