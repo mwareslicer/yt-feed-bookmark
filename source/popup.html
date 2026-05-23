@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Abo-Lesezeichen</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 340px;
+      min-height: 200px;
+      background: #0f0f0f;
+      color: #f1f1f1;
+      font-family: "Segoe UI", "Roboto", sans-serif;
+      font-size: 13px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid #272727;
+    }
+
+    .header-icon {
+      width: 28px;
+      height: 28px;
+      background: #ff0000;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header-icon svg {
+      width: 16px;
+      height: 16px;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.01em;
+    }
+
+    .header p {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 1px;
+    }
+
+    /* Status bar */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: #1a1a1a;
+      border-bottom: 1px solid #272727;
+    }
+
+    .status-count {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .status-count span {
+      color: #ff4444;
+      font-weight: 600;
+    }
+
+    .btn-clear-seen {
+      font-size: 11px;
+      background: none;
+      border: 1px solid #333;
+      color: #aaa;
+      padding: 3px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-clear-seen:hover {
+      border-color: #ff4444;
+      color: #ff4444;
+    }
+
+    /* Empty state */
+    .empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 36px 24px;
+      color: #555;
+      text-align: center;
+    }
+
+    .empty svg {
+      width: 36px;
+      height: 36px;
+      opacity: 0.4;
+    }
+
+    .empty p {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #555;
+    }
+
+    /* Not on correct page */
+    .wrong-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 28px 20px;
+      text-align: center;
+    }
+
+    .wrong-page svg {
+      width: 32px;
+      height: 32px;
+      color: #ff4444;
+      opacity: 0.7;
+    }
+
+    .wrong-page p {
+      font-size: 12px;
+      color: #888;
+      line-height: 1.5;
+    }
+
+    .btn-goto {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ff0000;
+      color: #fff;
+      text-decoration: none;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: background 0.15s;
+    }
+
+    .btn-goto:hover {
+      background: #cc0000;
+    }
+
+    /* Bookmark list */
+    .bookmark-list {
+      max-height: 360px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #333 transparent;
+    }
+
+    .bookmark-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e1e1e;
+      transition: background 0.12s;
+    }
+
+    .bookmark-item:hover {
+      background: #1a1a1a;
+    }
+
+    .bookmark-thumb {
+      width: 64px;
+      height: 36px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: #222;
+      flex-shrink: 0;
+    }
+
+    .bookmark-thumb-placeholder {
+      width: 64px;
+      height: 36px;
+      background: #222;
+      border-radius: 4px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #444;
+    }
+
+    .bookmark-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .bookmark-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: #e0e0e0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+      text-decoration: none;
+      display: block;
+    }
+
+    .bookmark-title:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    .bookmark-channel {
+      font-size: 11px;
+      color: #888;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bookmark-date {
+      font-size: 10px;
+      color: #555;
+      margin-top: 2px;
+    }
+
+    .btn-remove {
+      background: none;
+      border: none;
+      color: #555;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      transition: color 0.15s, background 0.15s;
+      display: flex;
+    }
+
+    .btn-remove:hover {
+      color: #ff4444;
+      background: rgba(255, 68, 68, 0.1);
+    }
+
+    .btn-remove svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 10px 16px;
+      border-top: 1px solid #1e1e1e;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-hint {
+      font-size: 10px;
+      color: #444;
+      line-height: 1.4;
+    }
+
+    /* Badge Toggle */
+    .badge-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      border-bottom: 1px solid #1e1e1e;
+      background: #161616;
+    }
+    .badge-toggle-label {
+      font-size: 12px;
+      color: #aaa;
+    }
+    .toggle-btn {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      background: #333;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .toggle-btn.active {
+      background: #ff0000;
+    }
+    .toggle-knob {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+      display: block;
+    }
+    .toggle-btn.active .toggle-knob {
+      transform: translateX(16px);
+    }
+
+    /* Item Actions */
+    .item-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+
+    .btn-goto-video {
+      background: none;
+      border: none;
+      color: #555;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      display: flex;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .btn-goto-video:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+    }
+
+    .btn-goto-video svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-debug {
+      display: block;
+      width: calc(100% - 32px);
+      margin: 8px 16px;
+      padding: 6px;
+      background: #1a1a1a;
+      border: 1px dashed #333;
+      color: #555;
+      font-size: 11px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-debug:hover { color: #aaa; border-color: #555; }
+    #debug-out {
+      margin: 0 16px 8px;
+      padding: 8px;
+      background: #0a0a0a;
+      border: 1px solid #222;
+      border-radius: 4px;
+      font-size: 10px;
+      color: #aaa;
+      white-space: pre-wrap;
+      word-break: break-all;
+      display: none;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    /* Badge Controls */
+    .badge-controls {
+      border-bottom: 1px solid #1e1e1e;
+    }
+    .badge-mode {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 16px 8px;
+    }
+    .badge-mode.disabled {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .mode-switcher {
+      display: flex;
+      border: 1px solid #333;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .mode-btn {
+      padding: 3px 10px;
+      font-size: 11px;
+      background: #1e1e1e;
+      border: none;
+      border-radius: 0;
+      color: #777;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .mode-btn + .mode-btn {
+      border-left: 1px solid #333;
+    }
+    .mode-btn.active {
+      background: #ff0000;
+      color: #fff;
+    }
+    .mode-btn:not(.active):hover {
+      background: #2a2a2a;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Abo-Lesezeichen</h1>
+      <p>YouTube Subscription Tracker</p>
+    </div>
+  </div>
+
+  <div id="app">
+    <!-- Wird per JS befüllt -->
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
